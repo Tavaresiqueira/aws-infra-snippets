@@ -4,7 +4,22 @@ import zipfile
 import io
 import time
 
-def create_or_update_lambda_function(function_name, code, handler, runtime='python3.8'):
+def create_or_update_lambda_function(function_name: str, code: str, handler: str = 'lambda_function.lambda_handler', runtime: str = 'python3.8') -> dict:
+    """
+    Create or update a Lambda function.
+
+    Args:
+        function_name (str): The name of the function.
+        code (str): The code for the function.
+        handler (str): The handler for the function.
+        runtime (str, optional): The runtime for the function. Defaults to 'python3.8'.
+
+    Returns:
+        dict: The response from the Lambda client, or an error dictionary.
+
+    Raises:
+        Exception: If an error occurs during the creation or update of the Lambda function.
+    """
     iam_client = boto3.client('iam')
     lambda_client = boto3.client('lambda')
 
@@ -29,10 +44,6 @@ def create_or_update_lambda_function(function_name, code, handler, runtime='pyth
         role_arn = create_role_response['Role']['Arn']
 
         # Attach policies
-        iam_client.attach_role_policy(
-            RoleName=role_name,
-            PolicyArn='arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole'
-        )
         iam_client.attach_role_policy(
             RoleName=role_name,
             PolicyArn='arn:aws:iam::aws:policy/AmazonS3FullAccess'
@@ -84,4 +95,3 @@ def create_or_update_lambda_function(function_name, code, handler, runtime='pyth
         return response
     except Exception as e:
         return {'Error': str(e)}
-
